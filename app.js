@@ -53,10 +53,12 @@
     statInvestAmount: document.getElementById('stat-invest-amount'),
     statCashPct: document.getElementById('stat-cash-pct'),
     statCashAmount: document.getElementById('stat-cash-amount'),
-    // Rebalancing
+    // Rebalancing & Fine Precision Allocation
     targetSlider: document.getElementById('target-slider'),
-    targetInvestLabel: document.getElementById('target-invest-label'),
+    targetInvestInput: document.getElementById('target-invest-input'),
     targetCashLabel: document.getElementById('target-cash-label'),
+    stepTargetDown: document.getElementById('step-target-down'),
+    stepTargetUp: document.getElementById('step-target-up'),
     presetBtns: document.querySelectorAll('.preset-btn'),
     rebalanceCard: document.getElementById('rebalance-card'),
     rebalanceIcon: document.getElementById('rebalance-icon'),
@@ -64,13 +66,17 @@
     rebalanceDescription: document.getElementById('rebalance-description'),
     cashflowInput: document.getElementById('cashflow-input'),
     cashflowResult: document.getElementById('cashflow-result'),
-    // Feature 5: Interest & Opportunity Cost
+    // Feature 5: Interest & Opportunity Cost with precision
     toggleInterestControls: document.getElementById('toggle-interest-controls'),
     interestControlsWrap: document.getElementById('interest-controls-wrap'),
     sliderInterestRate: document.getElementById('slider-interest-rate'),
+    inputInterestRate: document.getElementById('input-interest-rate'),
+    stepInterestDown: document.getElementById('step-interest-down'),
+    stepInterestUp: document.getElementById('step-interest-up'),
     sliderMarketRate: document.getElementById('slider-market-rate'),
-    labelInterestRate: document.getElementById('label-interest-rate'),
-    labelMarketRate: document.getElementById('label-market-rate'),
+    inputMarketRate: document.getElementById('input-market-rate'),
+    stepMarketDown: document.getElementById('step-market-down'),
+    stepMarketUp: document.getElementById('step-market-up'),
     oppInterestAnnual: document.getElementById('opp-interest-annual'),
     oppInterestMonthly: document.getElementById('opp-interest-monthly'),
     oppCostAnnual: document.getElementById('opp-cost-annual'),
@@ -227,9 +233,13 @@
 
     // Target allocation slider and labels
     const targetInvest = Number(state.targetInvestPct);
-    const targetCash = 100 - targetInvest;
-    elements.targetInvestLabel.textContent = `${targetInvest}%`;
-    elements.targetCashLabel.textContent = `${targetCash}%`;
+    const targetCash = +(100 - targetInvest).toFixed(1);
+    if (elements.targetInvestInput && document.activeElement !== elements.targetInvestInput) {
+      elements.targetInvestInput.value = targetInvest;
+    }
+    if (elements.targetCashLabel) {
+      elements.targetCashLabel.textContent = `${targetCash}%`;
+    }
     elements.targetSlider.value = targetInvest;
     elements.targetSlider.style.background = `linear-gradient(to right, var(--color-invest) 0%, var(--color-invest) ${targetInvest}%, var(--color-cash) ${targetInvest}%, var(--color-cash) 100%)`;
 
@@ -333,8 +343,12 @@
     const iRate = Number(state.interestRate) || 3.5;
     const mRate = Number(state.marketRate) || 7.0;
 
-    elements.labelInterestRate.textContent = `${iRate.toFixed(2).replace('.', ',')}% p.a.`;
-    elements.labelMarketRate.textContent = `${mRate.toFixed(2).replace('.', ',')}% p.a.`;
+    if (elements.inputInterestRate && document.activeElement !== elements.inputInterestRate) {
+      elements.inputInterestRate.value = iRate.toFixed(2);
+    }
+    if (elements.inputMarketRate && document.activeElement !== elements.inputMarketRate) {
+      elements.inputMarketRate.value = mRate.toFixed(2);
+    }
     elements.sliderInterestRate.value = iRate;
     elements.sliderMarketRate.value = mRate;
 
@@ -622,12 +636,40 @@
       });
     });
 
-    // Target Slider
+    // Target Slider & Fine Precision Controls
     elements.targetSlider.addEventListener('input', (e) => {
       state.targetInvestPct = Number(e.target.value);
       saveState();
       updateUI();
     });
+
+    if (elements.targetInvestInput) {
+      elements.targetInvestInput.addEventListener('input', (e) => {
+        let val = Number(e.target.value);
+        if (!isNaN(val)) {
+          val = Math.min(100, Math.max(0, val));
+          state.targetInvestPct = val;
+          saveState();
+          updateUI();
+        }
+      });
+    }
+
+    if (elements.stepTargetDown) {
+      elements.stepTargetDown.addEventListener('click', () => {
+        state.targetInvestPct = Math.max(0, +(Number(state.targetInvestPct) - 1).toFixed(1));
+        saveState();
+        updateUI();
+      });
+    }
+
+    if (elements.stepTargetUp) {
+      elements.stepTargetUp.addEventListener('click', () => {
+        state.targetInvestPct = Math.min(100, +(Number(state.targetInvestPct) + 1).toFixed(1));
+        saveState();
+        updateUI();
+      });
+    }
 
     // Preset Buttons
     elements.presetBtns.forEach(btn => {
@@ -697,18 +739,72 @@
       closePosModal();
     });
 
-    // Feature 5: Interest Rate Controls
+    // Feature 5: Interest Rate Controls with Precision
     elements.sliderInterestRate.addEventListener('input', (e) => {
       state.interestRate = Number(e.target.value);
       saveState();
       updateUI();
     });
 
+    if (elements.inputInterestRate) {
+      elements.inputInterestRate.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        if (!isNaN(val)) {
+          state.interestRate = Math.max(0, val);
+          saveState();
+          updateUI();
+        }
+      });
+    }
+
+    if (elements.stepInterestDown) {
+      elements.stepInterestDown.addEventListener('click', () => {
+        state.interestRate = Math.max(0, +(Number(state.interestRate) - 0.1).toFixed(2));
+        saveState();
+        updateUI();
+      });
+    }
+
+    if (elements.stepInterestUp) {
+      elements.stepInterestUp.addEventListener('click', () => {
+        state.interestRate = +(Number(state.interestRate) + 0.1).toFixed(2);
+        saveState();
+        updateUI();
+      });
+    }
+
     elements.sliderMarketRate.addEventListener('input', (e) => {
       state.marketRate = Number(e.target.value);
       saveState();
       updateUI();
     });
+
+    if (elements.inputMarketRate) {
+      elements.inputMarketRate.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        if (!isNaN(val)) {
+          state.marketRate = Math.max(0, val);
+          saveState();
+          updateUI();
+        }
+      });
+    }
+
+    if (elements.stepMarketDown) {
+      elements.stepMarketDown.addEventListener('click', () => {
+        state.marketRate = Math.max(0, +(Number(state.marketRate) - 0.5).toFixed(2));
+        saveState();
+        updateUI();
+      });
+    }
+
+    if (elements.stepMarketUp) {
+      elements.stepMarketUp.addEventListener('click', () => {
+        state.marketRate = +(Number(state.marketRate) + 0.5).toFixed(2);
+        saveState();
+        updateUI();
+      });
+    }
 
     elements.toggleInterestControls.addEventListener('click', () => {
       elements.interestControlsWrap.classList.toggle('hidden');

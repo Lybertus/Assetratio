@@ -1209,3 +1209,118 @@ body {
   line-height: 1.35;
 }
 
+/* ==========================================================================
+   Fine Precision Steppers & Direct Numeric Inputs
+   ========================================================================== */
+.slider-with-steppers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.stepper-btn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 9px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.stepper-btn:active {
+  transform: scale(0.92);
+  background: #2E2E38;
+}
+
+.stepper-btn-mini {
+  background: #24242A;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.stepper-btn-mini:active {
+  transform: scale(0.92);
+  background: #33333E;
+  color: var(--text-primary);
+}
+
+.ratio-number-input {
+  width: 50px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--color-invest-light);
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 2px 4px;
+  text-align: center;
+  outline: none;
+  font-family: var(--font-sans);
+}
+
+.ratio-number-input:focus {
+  border-color: var(--color-invest);
+  box-shadow: 0 0 0 2px var(--color-invest-glow);
+}
+
+/* Rate input badges */
+.rate-input-badge-wrap {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  gap: 2px;
+}
+
+.rate-input-badge-wrap.cash {
+  background: var(--color-cash-bg);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
+.rate-input-badge-wrap.market {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.rate-direct-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  font-weight: 800;
+  width: 44px;
+  text-align: right;
+  font-family: var(--font-sans);
+}
+
+.rate-direct-input.cash {
+  color: var(--color-cash-light);
+}
+
+.rate-direct-input.market {
+  color: #C084FC;
+}
+
+.rate-unit {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-left: 2px;
+  pointer-events: none;
+}
+
+

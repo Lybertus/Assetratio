@@ -1,5 +1,5 @@
 // Service Worker for AssetRatio PWA
-const CACHE_NAME = 'assetratio-v2';
+const CACHE_NAME = 'assetratio-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

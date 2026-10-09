@@ -146,15 +146,22 @@
           <div class="target-section">
             <div class="target-header">
               <span class="stat-name">Wunsch-Allokation</span>
-              <div class="target-ratios">
-                <span id="target-invest-label" class="invest-target">80%</span> Invest /
-                <span id="target-cash-label" class="cash-target">20%</span> Cash
+              <div class="target-ratios" style="display: flex; align-items: center; gap: 4px;">
+                <input type="number" id="target-invest-input" class="ratio-number-input" min="0" max="100" step="0.5" value="80" aria-label="Wunsch-Quote Investiert in Prozent">
+                <span class="invest-target">% Invest</span>
+                <span style="color: var(--text-muted); margin: 0 2px;">/</span>
+                <span id="target-cash-label" class="cash-target">20%</span>
+                <span class="cash-target" style="font-size: 0.85rem; font-weight: 600;">Cash</span>
               </div>
             </div>
 
-            <!-- Interactive Target Slider -->
+            <!-- Interactive Target Slider with +/- 1% Steppers -->
             <div class="slider-container">
-              <input type="range" id="target-slider" class="allocation-slider" min="0" max="100" value="80" step="5" aria-label="Wunsch-Quote Investiert zu Cash">
+              <div class="slider-with-steppers">
+                <button type="button" id="step-target-down" class="stepper-btn" title="1% weniger Investieren">-1%</button>
+                <input type="range" id="target-slider" class="allocation-slider" min="0" max="100" value="80" step="0.5" aria-label="Wunsch-Quote Investiert zu Cash">
+                <button type="button" id="step-target-up" class="stepper-btn" title="1% mehr Investieren">+1%</button>
+              </div>
             </div>
 
             <!-- Target Presets -->
@@ -193,24 +200,38 @@
             <button id="toggle-interest-controls" class="chip-btn" style="padding: 4px 8px;">Anpassen</button>
           </div>
 
-          <!-- Interest & Market Rates Controls -->
+          <!-- Interest & Market Rates Controls with Steppers & Direct Input -->
           <div id="interest-controls-wrap" class="interest-rates-grid">
             <!-- Rate 1: Tagesgeld Zins -->
             <div class="rate-box">
               <div class="rate-label-wrap">
                 <span class="rate-label">Tagesgeld-Zins</span>
-                <span id="label-interest-rate" class="rate-badge cash">3,50% p.a.</span>
+                <div class="rate-input-badge-wrap cash">
+                  <input type="number" id="input-interest-rate" class="rate-direct-input cash" min="0" max="15" step="0.05" value="3.50" aria-label="Tagesgeld Zinssatz in Prozent">
+                  <span class="rate-unit">% p.a.</span>
+                </div>
               </div>
-              <input type="range" id="slider-interest-rate" class="rate-slider" min="0" max="6" step="0.25" value="3.5" aria-label="Tagesgeld Zinssatz">
+              <div class="slider-with-steppers">
+                <button type="button" id="step-interest-down" class="stepper-btn-mini" title="-0.1% Tagesgeld">-0.1</button>
+                <input type="range" id="slider-interest-rate" class="rate-slider" min="0" max="10" step="0.05" value="3.5" aria-label="Tagesgeld Zinssatz">
+                <button type="button" id="step-interest-up" class="stepper-btn-mini" title="+0.1% Tagesgeld">+0.1</button>
+              </div>
             </div>
 
             <!-- Rate 2: Aktienmarkt Rendite -->
             <div class="rate-box">
               <div class="rate-label-wrap">
                 <span class="rate-label">Aktien-Rendite</span>
-                <span id="label-market-rate" class="rate-badge market">7,00% p.a.</span>
+                <div class="rate-input-badge-wrap market">
+                  <input type="number" id="input-market-rate" class="rate-direct-input market" min="0" max="25" step="0.1" value="7.00" aria-label="Erwartete Aktienmarktrendite in Prozent">
+                  <span class="rate-unit">% p.a.</span>
+                </div>
               </div>
-              <input type="range" id="slider-market-rate" class="rate-slider" min="3" max="12" step="0.5" value="7.0" aria-label="Erwartete Aktienmarktrendite">
+              <div class="slider-with-steppers">
+                <button type="button" id="step-market-down" class="stepper-btn-mini" title="-0.5% Rendite">-0.5</button>
+                <input type="range" id="slider-market-rate" class="rate-slider" min="0" max="20" step="0.1" value="7.0" aria-label="Erwartete Aktienmarktrendite">
+                <button type="button" id="step-market-up" class="stepper-btn-mini" title="+0.5% Rendite">+0.5</button>
+              </div>
             </div>
           </div>
 
