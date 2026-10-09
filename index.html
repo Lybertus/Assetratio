@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AssetRatio – Invest & Cash Rechner</title>
+  
+  <!-- Apple Web App & iOS Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AssetRatio">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Echtzeit-Berechnung deiner Investitions- und Cash-Quote mit Rebalancing im Apple OLED Dark Mode.">
+
+  <!-- Icons & Manifest -->
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <img src="icon.svg" alt="AssetRatio Logo" class="brand-icon">
+        <div class="brand-title-group">
+          <h1>AssetRatio</h1>
+          <span class="brand-subtitle">Invest & Cash Portfolio</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Currency Selector -->
+        <div class="currency-select-wrapper">
+          <select id="currency-select" class="currency-select" aria-label="Währung wählen">
+            <option value="EUR">€ EUR</option>
+            <option value="USD">$ USD</option>
+            <option value="CHF">Fr CHF</option>
+          </select>
+        </div>
+
+        <!-- Privacy Toggle Button -->
+        <button id="privacy-toggle-btn" class="icon-button" aria-label="Privatsphäre umschalten" title="Beträge verbergen / anzeigen">
+          <svg id="eye-icon-open" viewBox="0 0 24 24">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+          <svg id="eye-icon-closed" class="hidden" viewBox="0 0 24 24">
+            <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+          </svg>
+        </button>
+
+        <!-- Settings / Backup Button -->
+        <button id="settings-btn" class="icon-button" aria-label="Einstellungen & Backup" title="Backup & Menü">
+          <svg viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Segmented Control -->
+    <nav class="segmented-control" role="tablist">
+      <button id="tab-quick" class="segment-btn active" role="tab" aria-selected="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 3.5h5v2h-5v-2zm-6 0h4v2H7v-2zm0 4.5h4v2H7v-2zm10 8h-4v-2h4v2zm0-4h-4v-2h4v2zm-6 4H7v-2h4v2z"/>
+        </svg>
+        Schnell-Rechner
+      </button>
+      <button id="tab-detail" class="segment-btn" role="tab" aria-selected="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+        </svg>
+        Detail-Portfolio
+      </button>
+    </nav>
+
+    <!-- Main Dashboard Grid -->
+    <main class="dashboard-grid">
+      
+      <!-- Left Column: Visual Chart & Overview -->
+      <section class="card overview-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #A1A1AA;">
+              <path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v8.99L21.99 11C21.47 5.92 17.5 2 13 2zm0 11.01V22c4.5 0 8.47-3.92 8.99-9H13z"/>
+            </svg>
+            Vermögens-Aufteilung
+          </h2>
+        </div>
+
+        <!-- Animated SVG Donut Chart -->
+        <div class="chart-container">
+          <svg class="ring-chart-svg" viewBox="0 0 220 220">
+            <!-- Background track -->
+            <circle class="ring-bg" cx="110" cy="110" r="90" />
+            <!-- Cash Ring Arc (Cyan) -->
+            <circle id="chart-ring-cash" class="ring-cash" cx="110" cy="110" r="90" stroke-dasharray="565.48" stroke-dashoffset="0" />
+            <!-- Invested Ring Arc (Emerald Green) -->
+            <circle id="chart-ring-invest" class="ring-invest" cx="110" cy="110" r="90" stroke-dasharray="565.48" stroke-dashoffset="0" />
+          </svg>
+
+          <!-- Center Text Overlay -->
+          <div class="chart-center-content">
+            <div class="chart-center-label">Gesamtvermögen</div>
+            <div id="stat-total-amount" class="chart-center-value privacy-sensitive">0 €</div>
+          </div>
+        </div>
+
+        <!-- Ratio Breakdown Statistics -->
+        <div class="stats-grid">
+          <!-- Invested Stat -->
+          <div class="stat-tile invest">
+            <div class="stat-label-group">
+              <span class="stat-name">Investiert</span>
+              <span id="stat-invest-pct" class="stat-badge">0,0%</span>
+            </div>
+            <div id="stat-invest-amount" class="stat-amount privacy-sensitive">0 €</div>
+          </div>
+
+          <!-- Cash Stat -->
+          <div class="stat-tile cash">
+            <div class="stat-label-group">
+              <span class="stat-name">Cash-Reserve</span>
+              <span id="stat-cash-pct" class="stat-badge">0,0%</span>
+            </div>
+            <div id="stat-cash-amount" class="stat-amount privacy-sensitive">0 €</div>
+          </div>
+        </div>
+
+        <!-- Target Allocation & Rebalancing -->
+        <div class="target-section">
+          <div class="target-header">
+            <span class="stat-name">Wunsch-Allokation</span>
+            <div class="target-ratios">
+              <span id="target-invest-label" class="invest-target">80%</span> Invest /
+              <span id="target-cash-label" class="cash-target">20%</span> Cash
+            </div>
+          </div>
+
+          <!-- Interactive Target Slider -->
+          <div class="slider-container">
+            <input type="range" id="target-slider" class="allocation-slider" min="0" max="100" value="80" step="5" aria-label="Wunsch-Quote Investiert zu Cash">
+          </div>
+
+          <!-- Target Presets -->
+          <div class="slider-presets">
+            <button class="preset-btn" data-target="90">90 / 10</button>
+            <button class="preset-btn active" data-target="80">80 / 20</button>
+            <button class="preset-btn" data-target="70">70 / 30</button>
+            <button class="preset-btn" data-target="60">60 / 40</button>
+            <button class="preset-btn" data-target="50">50 / 50</button>
+          </div>
+
+          <!-- Rebalancing Feedback Card -->
+          <div id="rebalance-card" class="rebalance-box">
+            <div id="rebalance-icon" class="rebalance-icon-wrap buy">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 14l5-5 5 5z"/>
+              </svg>
+            </div>
+            <div class="rebalance-text">
+              <h4 id="rebalance-title">Rebalancing-Empfehlung</h4>
+              <p id="rebalance-description">Gib deine Werte ein, um die optimale Allokation zu berechnen.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Input Controls & Positions -->
+      <section class="card input-card">
+        
+        <!-- Tab 1: Schnell-Rechner Content -->
+        <div id="view-quick">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-invest);">
+                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+              </svg>
+              Schnelleingabe
+            </h2>
+          </div>
+
+          <!-- Input: Investiertes Vermögen -->
+          <div class="input-group">
+            <div class="input-label">
+              <span>Investiertes Vermögen (Aktien, ETFs, Krypto)</span>
+            </div>
+            <div class="currency-input-wrapper">
+              <span class="currency-symbol currency-sign">€</span>
+              <input type="number" id="quick-input-invest" class="number-input" placeholder="0" inputmode="decimal" step="any">
+            </div>
+            <div class="quick-chips">
+              <button class="chip-btn" data-target="quick-input-invest" data-add="1000">+1.000</button>
+              <button class="chip-btn" data-target="quick-input-invest" data-add="5000">+5.000</button>
+              <button class="chip-btn" data-target="quick-input-invest" data-add="10000">+10.000</button>
+              <button class="chip-btn" data-target="quick-input-invest" data-add="50000">+50.000</button>
+            </div>
+          </div>
+
+          <!-- Input: Cash / Liquidität -->
+          <div class="input-group" style="margin-top: 24px;">
+            <div class="input-label">
+              <span>Cash & Liquidität (Tagesgeld, Giro, Notgroschen)</span>
+            </div>
+            <div class="currency-input-wrapper">
+              <span class="currency-symbol currency-sign">€</span>
+              <input type="number" id="quick-input-cash" class="number-input" placeholder="0" inputmode="decimal" step="any">
+            </div>
+            <div class="quick-chips">
+              <button class="chip-btn" data-target="quick-input-cash" data-add="500">+500</button>
+              <button class="chip-btn" data-target="quick-input-cash" data-add="1000">+1.000</button>
+              <button class="chip-btn" data-target="quick-input-cash" data-add="5000">+5.000</button>
+              <button class="chip-btn" data-target="quick-input-cash" data-add="10000">+10.000</button>
+            </div>
+          </div>
+
+          <!-- Cashflow Rebalancing Tool -->
+          <div class="target-section" style="margin-top: 30px;">
+            <div class="card-header" style="margin-bottom: 10px;">
+              <h2 class="card-title" style="font-size: 0.95rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-cash);">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+                </svg>
+                Neues Geld anlegen (Sparplan / Bonus)
+              </h2>
+            </div>
+            <div class="currency-input-wrapper">
+              <span class="currency-symbol currency-sign">€</span>
+              <input type="number" id="cashflow-input" class="number-input" placeholder="z. B. 1.000 einzahlen" inputmode="decimal">
+            </div>
+            <div id="cashflow-result" class="stat-name" style="margin-top: 10px; font-size: 0.82rem; line-height: 1.4;">
+              Gib einen Betrag ein, um zu sehen, wie du die neue Summe aufteilen solltest, um deine Ziel-Quote zu erreichen.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Detail-Portfolio Content -->
+        <div id="view-detail" class="hidden">
+          <div class="positions-section">
+            <div class="positions-header">
+              <h2 class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-cash);">
+                  <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
+                </svg>
+                Vermögenswerte & Konten
+              </h2>
+              <button id="add-position-btn" class="primary-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                Position
+              </button>
+            </div>
+
+            <!-- Position List -->
+            <div id="positions-list" class="positions-list">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div id="empty-state" class="empty-positions-state">
+              Noch keine Positionen angelegt.<br>
+              Tippe oben auf "+ Position", um Depots, Tagesgeld oder Krypto hinzuzufügen.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Installation Banner for iPhone / Safari -->
+    <aside id="install-guide-banner" class="pwa-install-banner">
+      <div class="banner-text">
+        <strong>Auf iPhone & Mac wie eine native App nutzen:</strong>
+        Im Safari-Browser auf <em>Teilen</em> &gt; <em>Zum Home-Bildschirm</em> tippen.
+      </div>
+      <button id="show-install-modal-btn" class="banner-btn">Anleitung</button>
+    </aside>
+
+  </div>
+
+  <!-- ==========================================================================
+       Modal: Neue Position hinzufügen
+       ========================================================================== -->
+  <div id="position-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-add-title">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="modal-add-title">Neue Position</h3>
+        <button id="close-position-modal" class="close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <form id="position-form">
+        <!-- Asset Name -->
+        <div class="form-group">
+          <label for="pos-name">Bezeichnung</label>
+          <input type="text" id="pos-name" class="form-input" placeholder="z. B. Trade Republic Depot, DKB Tagesgeld" required>
+        </div>
+
+        <!-- Quick Preset Buttons -->
+        <div class="quick-chips" style="margin-bottom: 16px;">
+          <button type="button" class="chip-btn name-preset" data-name="Trade Republic Depot" data-type="invest">Depot</button>
+          <button type="button" class="chip-btn name-preset" data-name="Scalable Capital" data-type="invest">Scalable</button>
+          <button type="button" class="chip-btn name-preset" data-name="Bitcoin / Krypto" data-type="invest">Krypto</button>
+          <button type="button" class="chip-btn name-preset" data-name="Tagesgeldkonto" data-type="cash">Tagesgeld</button>
+          <button type="button" class="chip-btn name-preset" data-name="Girokonto" data-type="cash">Girokonto</button>
+          <button type="button" class="chip-btn name-preset" data-name="Notgroschen" data-type="cash">Notgroschen</button>
+        </div>
+
+        <!-- Category: Investiert vs Cash -->
+        <div class="form-group">
+          <label>Kategorie</label>
+          <div class="category-radio-group">
+            <div id="radio-card-invest" class="radio-card selected invest">
+              <span class="position-tag invest"></span>
+              <div>
+                <strong style="color: var(--color-invest-light);">Investiert</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Aktien, ETFs, Krypto</div>
+              </div>
+            </div>
+            <div id="radio-card-cash" class="radio-card cash">
+              <span class="position-tag cash"></span>
+              <div>
+                <strong style="color: var(--color-cash-light);">Cash</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Tagesgeld, Giro, Bar</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group">
+          <label for="pos-amount">Betrag</label>
+          <div class="currency-input-wrapper">
+            <span class="currency-symbol currency-sign">€</span>
+            <input type="number" id="pos-amount" class="number-input" placeholder="0" inputmode="decimal" step="any" required>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancel-pos-btn" class="btn-secondary">Abbrechen</button>
+          <button type="submit" class="btn-primary-action">Hinzufügen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Modal: Einstellungen & Datensicherung (Backup / Restore)
+       ========================================================================== -->
+  <div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-settings-title">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="modal-settings-title">Daten & Backup</h3>
+        <button id="close-settings-modal" class="close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+          Deine Daten werden sicher und lokal in deinem Browser (LocalStorage) gespeichert. Du kannst jederzeit eine Sicherungskopie exportieren.
+        </p>
+
+        <button id="export-json-btn" class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          Portfolio-Backup exportieren (JSON)
+        </button>
+
+        <label class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+          </svg>
+          Backup wiederherstellen (JSON)
+          <input type="file" id="import-json-file" accept=".json" style="display: none;">
+        </label>
+
+        <button id="load-sample-btn" class="btn-secondary" style="color: #60A5FA;">
+          Beispiel-Portfolio laden (75k Invest / 25k Cash)
+        </button>
+
+        <button id="reset-data-btn" class="btn-secondary" style="color: var(--color-danger); border-color: rgba(239, 68, 68, 0.2);">
+          Alle Daten zurücksetzen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Modal: Installations-Anleitung für iPhone & Mac
+       ========================================================================== -->
+  <div id="install-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-install-title">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="modal-install-title">App auf iPhone & Mac installieren</h3>
+        <button id="close-install-modal" class="close-btn" aria-label="Schließen">✕</button>
+      </div>
+
+      <ul class="instructions-list">
+        <li>
+          <span class="step-num">1</span>
+          <div>
+            <strong>Auf dem iPhone 15 Pro Max (Safari):</strong><br>
+            Tippe unten in der Leiste auf den <strong>Teilen-Button</strong> (Quadrat mit Pfeil nach oben).
+          </div>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <div>
+            Scrolle nach unten und wähle <strong>"Zum Home-Bildschirm"</strong> aus.
+          </div>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <div>
+            Bestätige mit <strong>"Hinzufügen"</strong>. Die App erscheint nun wie eine native iOS-App mit eigenem Icon auf deinem Bildschirm und läuft im Vollbild ohne störende Safari-Leisten!
+          </div>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <div>
+            <strong>Auf dem MacBook Pro (Safari / Chrome):</strong><br>
+            Im Safari-Menü auf <em>Ablage &gt; Zum Dock hinzufügen</em> klicken oder im Chrome auf das Download-Symbol in der Adressleiste.
+          </div>
+        </li>
+      </ul>
+
+      <div class="modal-actions" style="margin-top: 24px;">
+        <button id="dismiss-install-modal" class="btn-primary-action">Verstanden</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="app.js"></script>
+</body>
+</html>
