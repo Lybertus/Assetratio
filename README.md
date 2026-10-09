@@ -14,12 +14,19 @@ Eine elegante, minimalistische Web-App im **Apple OLED True Black Dark Mode**, o
   - Wunsch-Quote einstellen (z. B. 80/20, 70/30).
   - Zeigt exakt an, wie viel Euro investiert werden sollten oder wie viel Cash aufgebaut werden muss.
   - *Cashflow-Rebalancing*: Berechnet, wie neue Sparraten oder Boni aufgeteilt werden sollten.
+- **Zins- & Opportunitätskosten-Rechner (Neu)**:
+  - Berechnet deinen monatlichen und jährlichen **passiven Zinsertrag** auf dein Cash (anpassbarer Tagesgeldzins).
+  - Zeigt exakt deine **Opportunitätskosten** im Vergleich zur erwarteten Aktienmarktrendite (z. B. 7 % MSCI World).
+  - Visueller Vergleichsbalken mit Kontextanalyse.
+- **CSV- & Excel-Export / Portfolio Performance (Neu)**:
+  - *Excel / Apple Numbers (CSV)*: Fertig formatiert mit Semikolon (`;`), Datumsstempel, Einzelwerten, Quoten und Zinsstatistiken.
+  - *Portfolio Performance & Parqet (CSV)*: Direkt kompatibel zum Importieren deiner Depots und Konten.
 - **Privatsphäre-Modus**: Ein Klick auf das Augen-Symbol verschleiert alle sensiblen Beträge in der Öffentlichkeit (Blur-Effekt).
 - **Währungswahl**: Umschaltbar zwischen `€ EUR`, `$ USD` und `Fr CHF`.
 - **Offline & Datensicherheit**:
   - 100% lokal im Browser (LocalStorage) gespeichert.
   - Keine externen Server oder Tracker.
-  - JSON-Export & -Import für Backups.
+  - JSON-Export & -Import für vollständige Backups.
   - Funktioniert offline dank integriertem Service Worker.
 
 ---
