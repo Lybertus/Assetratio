@@ -180,9 +180,48 @@
                   <path d="M7 14l5-5 5 5z"/>
                 </svg>
               </div>
-              <div class="rebalance-text">
+              <div class="rebalance-text" style="flex: 1;">
                 <h4 id="rebalance-title">Rebalancing-Empfehlung</h4>
                 <p id="rebalance-description">Gib deine Werte ein, um die optimale Allokation zu berechnen.</p>
+                <button type="button" id="apply-rebalance-btn" class="chip-btn hidden" style="margin-top: 10px; background: #2563EB; color: #FFFFFF; border: none; font-weight: 700;">
+                  ⚡ Rebalancing jetzt anwenden
+                </button>
+              </div>
+            </div>
+
+            <!-- Crash- & Markt-Stresstest Simulator -->
+            <div class="target-section stress-test-section" style="margin-top: 18px; padding-top: 16px;">
+              <div class="target-header">
+                <span class="stat-name">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color: #F87171; vertical-align: -2px;">
+                    <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                  </svg>
+                  Crash- & Markt-Simulator
+                </span>
+                <span id="stress-badge" class="stat-badge" style="background: rgba(255,255,255,0.08); color: var(--text-secondary);">Normal (0%)</span>
+              </div>
+
+              <div class="slider-with-steppers" style="margin-top: 6px;">
+                <button type="button" id="step-stress-down" class="stepper-btn-mini" title="-5% Markt">-5%</button>
+                <input type="range" id="stress-slider" class="rate-slider" min="-50" max="50" step="5" value="0" aria-label="Marktbewegung simulieren">
+                <button type="button" id="step-stress-up" class="stepper-btn-mini" title="+5% Markt">+5%</button>
+              </div>
+
+              <div class="quick-chips" style="margin-top: 10px;">
+                <button type="button" class="chip-btn stress-preset" data-stress="-35">💥 -35% Crash</button>
+                <button type="button" class="chip-btn stress-preset" data-stress="-20">📉 -20% Bär</button>
+                <button type="button" class="chip-btn stress-preset active" data-stress="0">0% Normal</button>
+                <button type="button" class="chip-btn stress-preset" data-stress="20">📈 +20% Bulle</button>
+              </div>
+
+              <div id="stress-result-box" class="rebalance-box hidden" style="background: #181416; border-color: rgba(248, 113, 113, 0.3); margin-top: 12px;">
+                <div class="rebalance-text" style="width: 100%;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong id="stress-title" style="color: #F87171; font-size: 0.85rem;">Crash-Szenario aktiv</strong>
+                    <button type="button" id="reset-stress-btn" class="chip-btn" style="padding: 2px 8px; font-size: 0.7rem;">Normal</button>
+                  </div>
+                  <div id="stress-details" style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45;"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -267,6 +306,52 @@
             </p>
           </div>
         </section>
+
+        <!-- Feature: Notgroschen & Sicherheits-Puffer Rechner -->
+        <section class="card emergency-fund-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #38BDF8;">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+              </svg>
+              Notgroschen & Monats-Puffer
+            </h2>
+            <span id="emergency-health-badge" class="stat-badge" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">Optimal</span>
+          </div>
+
+          <div class="input-group" style="margin-bottom: 12px;">
+            <div class="input-label">
+              <span>Monatliche Lebenshaltungskosten (Fixkosten)</span>
+            </div>
+            <div class="currency-input-wrapper">
+              <span class="currency-symbol currency-sign">€</span>
+              <input type="number" id="expenses-input" class="number-input" placeholder="2.500" value="2500" inputmode="decimal">
+            </div>
+            <div class="quick-chips">
+              <button type="button" class="chip-btn expense-chip" data-val="1500">1.500</button>
+              <button type="button" class="chip-btn expense-chip" data-val="2000">2.000</button>
+              <button type="button" class="chip-btn expense-chip" data-val="2500">2.500</button>
+              <button type="button" class="chip-btn expense-chip" data-val="3500">3.500</button>
+            </div>
+          </div>
+
+          <div class="opp-results-grid" style="margin-bottom: 12px;">
+            <div class="opp-stat-card income">
+              <div class="opp-stat-title">Cash-Reichweite</div>
+              <div id="runway-months" class="opp-stat-value">10,0 Monate</div>
+              <div id="runway-status-sub" class="opp-stat-sub">Vollständig abgesichert</div>
+            </div>
+            <div class="opp-stat-card opportunity" style="border-left-color: #38BDF8;">
+              <div class="opp-stat-title">Freies Anlage-Cash</div>
+              <div id="free-cash-amount" class="opp-stat-value privacy-sensitive">10.000 €</div>
+              <div class="opp-stat-sub">Über 6 Monats-Puffer</div>
+            </div>
+          </div>
+
+          <div id="emergency-advice" class="rebalance-text" style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45; background: var(--bg-card-subtle); padding: 12px 14px; border-radius: var(--radius-md);">
+            <!-- Dynamic Advice will be rendered here -->
+          </div>
+        </section>
       </div>
 
       <!-- Right Column: Input Controls & Positions -->
@@ -333,6 +418,43 @@
             </div>
             <div id="cashflow-result" class="stat-name" style="margin-top: 10px; font-size: 0.82rem; line-height: 1.4;">
               Gib einen Betrag ein, um zu sehen, wie du die neue Summe aufteilen solltest, um deine Ziel-Quote zu erreichen.
+            </div>
+
+            <!-- Compound Interest & Wealth Growth Timeline -->
+            <div class="target-section" style="margin-top: 24px; padding-top: 16px;">
+              <div class="card-header" style="margin-bottom: 6px;">
+                <h2 class="card-title" style="font-size: 0.95rem;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #A78BFA;">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
+                  </svg>
+                  Vermögens-Prognose (Zinseszins)
+                </h2>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">
+                Entwicklung mit aktuellem Portfolio + Sparplan (<span id="prognosis-weighted-return">6,3%</span> Ø Rendite p.a.):
+              </div>
+              <div class="prognosis-grid">
+                <div class="prognosis-tile">
+                  <div class="prognosis-year">In 3 Jahren</div>
+                  <div id="prog-3" class="prognosis-value privacy-sensitive">0 €</div>
+                  <div id="prog-gain-3" class="prognosis-gain">+0 €</div>
+                </div>
+                <div class="prognosis-tile">
+                  <div class="prognosis-year">In 5 Jahren</div>
+                  <div id="prog-5" class="prognosis-value privacy-sensitive">0 €</div>
+                  <div id="prog-gain-5" class="prognosis-gain">+0 €</div>
+                </div>
+                <div class="prognosis-tile">
+                  <div class="prognosis-year">In 10 Jahren</div>
+                  <div id="prog-10" class="prognosis-value privacy-sensitive">0 €</div>
+                  <div id="prog-gain-10" class="prognosis-gain">+0 €</div>
+                </div>
+                <div class="prognosis-tile">
+                  <div class="prognosis-year">In 20 Jahren</div>
+                  <div id="prog-20" class="prognosis-value privacy-sensitive">0 €</div>
+                  <div id="prog-gain-20" class="prognosis-gain">+0 €</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

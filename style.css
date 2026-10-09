@@ -1323,4 +1323,66 @@ body {
   pointer-events: none;
 }
 
+/* ==========================================================================
+   Crash-Simulator & Stress-Test Styles
+   ========================================================================== */
+.stress-preset.active {
+  background: #3B1C22;
+  border-color: #EF4444;
+  color: #FCA5A5;
+}
+
+/* ==========================================================================
+   Emergency Fund Card Styles
+   ========================================================================== */
+.emergency-fund-card {
+  margin-top: 20px;
+}
+
+/* ==========================================================================
+   Compound Growth Prognose Timeline
+   ========================================================================== */
+.prognosis-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+@media (max-width: 600px) {
+  .prognosis-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.prognosis-tile {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  text-align: center;
+}
+
+.prognosis-year {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.prognosis-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.prognosis-gain {
+  font-size: 0.68rem;
+  color: var(--color-invest-light);
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+
 

@@ -26,7 +26,9 @@
     ],
     cashflowDeposit: 1000,
     interestRate: 3.5,
-    marketRate: 7.0
+    marketRate: 7.0,
+    monthlyExpenses: 2500,
+    marketStress: 0
   };
 
   // State object
@@ -64,6 +66,17 @@
     rebalanceIcon: document.getElementById('rebalance-icon'),
     rebalanceTitle: document.getElementById('rebalance-title'),
     rebalanceDescription: document.getElementById('rebalance-description'),
+    applyRebalanceBtn: document.getElementById('apply-rebalance-btn'),
+    // Stress Test Simulator
+    stressSlider: document.getElementById('stress-slider'),
+    stressBadge: document.getElementById('stress-badge'),
+    stepStressDown: document.getElementById('step-stress-down'),
+    stepStressUp: document.getElementById('step-stress-up'),
+    stressPresetBtns: document.querySelectorAll('.stress-preset'),
+    stressResultBox: document.getElementById('stress-result-box'),
+    stressTitle: document.getElementById('stress-title'),
+    stressDetails: document.getElementById('stress-details'),
+    resetStressBtn: document.getElementById('reset-stress-btn'),
     cashflowInput: document.getElementById('cashflow-input'),
     cashflowResult: document.getElementById('cashflow-result'),
     // Feature 5: Interest & Opportunity Cost with precision
@@ -86,6 +99,24 @@
     oppBarFillIncome: document.getElementById('opp-bar-fill-income'),
     oppBarFillDiff: document.getElementById('opp-bar-fill-diff'),
     oppInsightText: document.getElementById('opp-insight-text'),
+    // Emergency Fund / Runway
+    expensesInput: document.getElementById('expenses-input'),
+    expenseChips: document.querySelectorAll('.expense-chip'),
+    emergencyHealthBadge: document.getElementById('emergency-health-badge'),
+    runwayMonths: document.getElementById('runway-months'),
+    runwayStatusSub: document.getElementById('runway-status-sub'),
+    freeCashAmount: document.getElementById('free-cash-amount'),
+    emergencyAdvice: document.getElementById('emergency-advice'),
+    // Compound Growth Prognosis
+    prognosisWeightedReturn: document.getElementById('prognosis-weighted-return'),
+    prog3: document.getElementById('prog-3'),
+    progGain3: document.getElementById('prog-gain-3'),
+    prog5: document.getElementById('prog-5'),
+    progGain5: document.getElementById('prog-gain-5'),
+    prog10: document.getElementById('prog-10'),
+    progGain10: document.getElementById('prog-gain-10'),
+    prog20: document.getElementById('prog-20'),
+    progGain20: document.getElementById('prog-gain-20'),
     // Quick inputs
     quickInputInvest: document.getElementById('quick-input-invest'),
     quickInputCash: document.getElementById('quick-input-cash'),
@@ -258,6 +289,15 @@
     // Feature 5: Interest & Opportunity Cost calculation
     updateInterestAndOpportunity(cash);
 
+    // Feature: Emergency Fund & Runway
+    updateEmergencyFund(cash);
+
+    // Feature: Crash- & Stress-Test Simulation
+    updateStressTest(invest, cash, total);
+
+    // Feature: Compound Growth Prognosis
+    updatePrognosis(total, investPct, cashPct);
+
     // Render positions if in detail mode
     renderPositionsList();
   }
@@ -269,6 +309,7 @@
       elements.rebalanceIcon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
       elements.rebalanceTitle.textContent = 'Bereit zur Eingabe';
       elements.rebalanceDescription.textContent = 'Gib dein investiertes Vermögen und deinen Cash-Betrag ein.';
+      if (elements.applyRebalanceBtn) elements.applyRebalanceBtn.classList.add('hidden');
       return;
     }
 
@@ -285,6 +326,7 @@
       elements.rebalanceIcon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
       elements.rebalanceTitle.textContent = 'Perfekt im Gleichgewicht!';
       elements.rebalanceDescription.innerHTML = `Deine Quote liegt bei <strong class="rebalance-amount-highlight">${formatPercent((invest/total)*100)} Invest</strong> und <strong class="rebalance-amount-highlight">${formatPercent((cash/total)*100)} Cash</strong>. Keine Umschichtung nötig.`;
+      if (elements.applyRebalanceBtn) elements.applyRebalanceBtn.classList.add('hidden');
     } else if (investDelta > 0) {
       // Under-invested: Need to invest more
       elements.rebalanceCard.className = 'rebalance-box';
@@ -292,6 +334,11 @@
       elements.rebalanceIcon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>`;
       elements.rebalanceTitle.textContent = 'Investitions-Chance (Cash abbauen)';
       elements.rebalanceDescription.innerHTML = `Um deine Wunsch-Quote von ${targetInvestPct}% zu erreichen, solltest du <strong class="rebalance-amount-highlight" style="color: var(--color-invest-light);">${formatMoney(investDelta)}</strong> aus deiner Cash-Reserve in ETFs/Aktien investieren.`;
+      if (elements.applyRebalanceBtn) {
+        elements.applyRebalanceBtn.classList.remove('hidden');
+        elements.applyRebalanceBtn.textContent = `⚡ ${formatMoney(investDelta)} jetzt investieren`;
+        elements.applyRebalanceBtn.style.background = '#059669';
+      }
     } else {
       // Over-invested: Need more cash buffer
       const cashNeeded = Math.abs(investDelta);
@@ -300,6 +347,11 @@
       elements.rebalanceIcon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>`;
       elements.rebalanceTitle.textContent = 'Cash-Puffer aufbauen';
       elements.rebalanceDescription.innerHTML = `Du bist mit ${formatPercent((invest/total)*100)} über deinem Ziel von ${targetInvestPct}%. Erhöhe deine Liquidität um <strong class="rebalance-amount-highlight" style="color: var(--color-cash-light);">${formatMoney(cashNeeded)}</strong> (z. B. durch Gewinne sichern oder neue Sparraten ins Cash leiten).`;
+      if (elements.applyRebalanceBtn) {
+        elements.applyRebalanceBtn.classList.remove('hidden');
+        elements.applyRebalanceBtn.textContent = `⚡ ${formatMoney(cashNeeded)} ins Cash sichern`;
+        elements.applyRebalanceBtn.style.background = '#0284C7';
+      }
     }
   }
 
@@ -384,6 +436,196 @@
     } else {
       elements.oppInsightText.innerHTML = `Bei deiner Cash-Reserve von <strong>${formatMoney(cash)}</strong> sicherst du dir ca. <strong>+${formatMoney(annualInterest)}</strong> Zinsen pro Jahr (${formatMoney(monthlyInterest)}/Monat). Gegenüber dem Aktienmarkt (${mRate.toFixed(1).replace('.', ',')}%) verzichtest du rechnerisch auf ca. <strong style="color: var(--color-warning);">-${formatMoney(oppCost)} / Jahr</strong> als Preis für sofortige Liquidität & Sicherheit.`;
     }
+  }
+
+  // ==========================================================================
+  // Haptic Feedback (Taptic Engine)
+  // ==========================================================================
+  function triggerHaptic(type = 'light') {
+    if ('vibrate' in navigator) {
+      try {
+        if (type === 'light') navigator.vibrate(10);
+        else if (type === 'medium') navigator.vibrate(25);
+        else if (type === 'success') navigator.vibrate([15, 40, 20]);
+      } catch (e) {}
+    }
+  }
+
+  // ==========================================================================
+  // 1-Klick Rebalancing Execution
+  // ==========================================================================
+  function applyRebalance() {
+    const { invest, cash, total } = calculateTotals();
+    const targetInvestPct = Number(state.targetInvestPct);
+    const idealInvest = total * (targetInvestPct / 100);
+    const delta = idealInvest - invest;
+    if (Math.abs(delta) < 10) return;
+
+    if (state.activeTab === 'quick') {
+      state.quickInvest = Math.round(Number(state.quickInvest || 0) + delta);
+      state.quickCash = Math.max(0, Math.round(Number(state.quickCash || 0) - delta));
+      if (elements.quickInputInvest) elements.quickInputInvest.value = state.quickInvest;
+      if (elements.quickInputCash) elements.quickInputCash.value = state.quickCash;
+    } else {
+      const investPos = state.positions.find(p => p.category === 'invest');
+      const cashPos = state.positions.find(p => p.category === 'cash');
+      if (investPos && cashPos) {
+        investPos.amount = Math.max(0, Math.round(investPos.amount + delta));
+        cashPos.amount = Math.max(0, Math.round(cashPos.amount - delta));
+      } else {
+        state.positions.push({
+          id: Date.now().toString(),
+          name: delta > 0 ? 'Investiertes Rebalancing' : 'Liquiditäts-Puffer',
+          category: delta > 0 ? 'invest' : 'cash',
+          amount: Math.abs(delta)
+        });
+      }
+    }
+    triggerHaptic('success');
+    saveState();
+    updateUI();
+  }
+
+  // ==========================================================================
+  // Feature: Notgroschen & Runway Calculator
+  // ==========================================================================
+  function updateEmergencyFund(cash) {
+    const expenses = Math.max(100, Number(state.monthlyExpenses) || 2500);
+    if (elements.expensesInput && document.activeElement !== elements.expensesInput) {
+      elements.expensesInput.value = expenses;
+    }
+
+    const runway = expenses > 0 ? cash / expenses : 0;
+    const safeBuffer6 = expenses * 6;
+    const freeCash = Math.max(0, cash - safeBuffer6);
+
+    if (elements.runwayMonths) {
+      elements.runwayMonths.textContent = `${runway.toFixed(1).replace('.', ',')} Monate`;
+    }
+    if (elements.freeCashAmount) {
+      elements.freeCashAmount.textContent = formatMoney(freeCash);
+    }
+
+    if (elements.emergencyHealthBadge && elements.runwayStatusSub && elements.emergencyAdvice) {
+      if (runway < 3) {
+        elements.emergencyHealthBadge.textContent = 'Kritisch (< 3 Mo.)';
+        elements.emergencyHealthBadge.style.color = '#EF4444';
+        elements.emergencyHealthBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+        elements.runwayStatusSub.textContent = 'Notgroschen zu niedrig';
+        elements.emergencyAdvice.innerHTML = `⚠️ Dein Cash deckt nur <strong>${runway.toFixed(1).replace('.', ',')} Monate</strong> deiner Ausgaben ab. Experten empfehlen mindestens <strong>3 Monate (${formatMoney(expenses * 3)})</strong> als Puffer, bevor du weiter investierst.`;
+      } else if (runway <= 6) {
+        elements.emergencyHealthBadge.textContent = 'Optimal (3–6 Mo.)';
+        elements.emergencyHealthBadge.style.color = '#34D399';
+        elements.emergencyHealthBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+        elements.runwayStatusSub.textContent = 'Solider Sicherheits-Puffer';
+        elements.emergencyAdvice.innerHTML = `✅ Perfekt ausbalanciert! Dein Cash liegt genau im empfohlenen Korridor von 3–6 Monatsausgaben (${formatMoney(expenses * 3)} bis ${formatMoney(safeBuffer6)}).`;
+      } else {
+        elements.emergencyHealthBadge.textContent = 'Hoher Puffer (> 6 Mo.)';
+        elements.emergencyHealthBadge.style.color = '#38BDF8';
+        elements.emergencyHealthBadge.style.background = 'rgba(56, 189, 248, 0.15)';
+        elements.runwayStatusSub.textContent = 'Sehr komfortabel abgesichert';
+        elements.emergencyAdvice.innerHTML = `💡 Deine Reserve reicht für <strong>${runway.toFixed(1).replace('.', ',')} Monate</strong>. Nach Abzug von 6 Monaten Notgroschen (${formatMoney(safeBuffer6)}) hast du <strong style="color: #38BDF8;" class="privacy-sensitive">${formatMoney(freeCash)}</strong> freies Kapital, das du investieren kannst.`;
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Feature: Crash- & Stress-Test Simulation
+  // ==========================================================================
+  function updateStressTest(invest, cash, total) {
+    if (!elements.stressSlider) return;
+    const stress = Number(state.marketStress) || 0;
+    elements.stressSlider.value = stress;
+
+    if (elements.stressPresetBtns) {
+      elements.stressPresetBtns.forEach(btn => {
+        btn.classList.toggle('active', Number(btn.getAttribute('data-stress')) === stress);
+      });
+    }
+
+    if (stress === 0) {
+      elements.stressBadge.textContent = 'Normal (0%)';
+      elements.stressBadge.style.color = 'var(--text-secondary)';
+      elements.stressBadge.style.background = 'rgba(255, 255, 255, 0.08)';
+      elements.stressResultBox.classList.add('hidden');
+      return;
+    }
+
+    elements.stressResultBox.classList.remove('hidden');
+    const isDrop = stress < 0;
+    const sign = stress > 0 ? '+' : '';
+    elements.stressBadge.textContent = `${sign}${stress}% ${isDrop ? 'Crash' : 'Rallye'}`;
+    elements.stressBadge.style.color = isDrop ? '#F87171' : '#34D399';
+    elements.stressBadge.style.background = isDrop ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)';
+
+    const simInvest = invest * (1 + stress / 100);
+    const simCash = cash;
+    const simTotal = simInvest + simCash;
+    const simCashPct = simTotal > 0 ? (simCash / simTotal) * 100 : 0;
+    const simInvestPct = simTotal > 0 ? (simInvest / simTotal) * 100 : 0;
+    const targetInvestPct = Number(state.targetInvestPct);
+    const simIdealInvest = simTotal * (targetInvestPct / 100);
+    const simBuyOpportunity = Math.max(0, simIdealInvest - simInvest);
+
+    elements.stressTitle.textContent = isDrop ? `Szenario: Börsencrash um ${stress}%` : `Szenario: Bullenmarkt um +${stress}%`;
+    elements.stressTitle.style.color = isDrop ? '#F87171' : '#34D399';
+
+    if (isDrop) {
+      elements.stressDetails.innerHTML =
+        `• Investiertes Vermögen sinkt auf <strong class="privacy-sensitive">${formatMoney(simInvest)}</strong> (${formatMoney(invest - simInvest)} Buchverlust)<br>` +
+        `• Deine Cash-Quote springt auf <strong>${formatPercent(simCashPct)}</strong> (vorher ${formatPercent((cash/total)*100)})<br>` +
+        `• 🎯 <strong>Antizyklische Chance:</strong> Du hättest <strong style="color: #34D399;" class="privacy-sensitive">${formatMoney(simBuyOpportunity)}</strong> Cash zum günstigen Nachkauf am Tiefpunkt!`;
+    } else {
+      elements.stressDetails.innerHTML =
+        `• Investiertes Vermögen steigt auf <strong class="privacy-sensitive">${formatMoney(simInvest)}</strong> (+${formatMoney(simInvest - invest)} Buchgewinn)<br>` +
+        `• Deine Investitions-Quote steigt auf <strong>${formatPercent(simInvestPct)}</strong><br>` +
+        `• ⚖️ <strong>Gewinnmitnahme:</strong> Um die ${targetInvestPct}%-Quote zu halten, könntest du <strong style="color: var(--color-cash-light);" class="privacy-sensitive">${formatMoney(simInvest - simIdealInvest)}</strong> Gewinne sichern.`;
+    }
+  }
+
+  // ==========================================================================
+  // Feature: Compound Growth Prognosis
+  // ==========================================================================
+  function updatePrognosis(total, investPct, cashPct) {
+    if (!elements.prognosisWeightedReturn) return;
+    const deposit = Number(elements.cashflowInput ? elements.cashflowInput.value : 0) || Number(state.cashflowDeposit) || 0;
+    const mRate = Number(state.marketRate) || 7.0;
+    const iRate = Number(state.interestRate) || 3.5;
+
+    const weightedRate = ((investPct * mRate) + (cashPct * iRate)) / 100;
+    elements.prognosisWeightedReturn.textContent = `${weightedRate.toFixed(1).replace('.', ',')}%`;
+
+    const rMonth = (weightedRate / 100) / 12;
+
+    function calcFuture(years) {
+      const months = years * 12;
+      let fv = 0;
+      if (rMonth > 0) {
+        fv = total * Math.pow(1 + rMonth, months) + deposit * ((Math.pow(1 + rMonth, months) - 1) / rMonth);
+      } else {
+        fv = total + (deposit * months);
+      }
+      const totalDeposited = total + (deposit * months);
+      const pureGain = Math.max(0, fv - totalDeposited);
+      return { fv, pureGain };
+    }
+
+    const p3 = calcFuture(3);
+    const p5 = calcFuture(5);
+    const p10 = calcFuture(10);
+    const p20 = calcFuture(20);
+
+    if (elements.prog3) elements.prog3.textContent = formatMoney(p3.fv);
+    if (elements.progGain3) elements.progGain3.textContent = `+${formatMoney(p3.pureGain)} Zins`;
+
+    if (elements.prog5) elements.prog5.textContent = formatMoney(p5.fv);
+    if (elements.progGain5) elements.progGain5.textContent = `+${formatMoney(p5.pureGain)} Zins`;
+
+    if (elements.prog10) elements.prog10.textContent = formatMoney(p10.fv);
+    if (elements.progGain10) elements.progGain10.textContent = `+${formatMoney(p10.pureGain)} Zins`;
+
+    if (elements.prog20) elements.prog20.textContent = formatMoney(p20.fv);
+    if (elements.progGain20) elements.progGain20.textContent = `+${formatMoney(p20.pureGain)} Zins`;
   }
 
   // ==========================================================================
@@ -583,6 +825,7 @@
       elements.tabDetail.setAttribute('aria-selected', 'false');
       elements.viewQuick.classList.remove('hidden');
       elements.viewDetail.classList.add('hidden');
+      triggerHaptic('light');
       saveState();
       updateUI();
     });
@@ -595,6 +838,7 @@
       elements.tabQuick.setAttribute('aria-selected', 'false');
       elements.viewDetail.classList.remove('hidden');
       elements.viewQuick.classList.add('hidden');
+      triggerHaptic('light');
       saveState();
       updateUI();
     });
@@ -630,6 +874,7 @@
           } else if (targetId === 'quick-input-cash') {
             state.quickCash = nextVal;
           }
+          triggerHaptic('light');
           saveState();
           updateUI();
         }
@@ -658,6 +903,7 @@
     if (elements.stepTargetDown) {
       elements.stepTargetDown.addEventListener('click', () => {
         state.targetInvestPct = Math.max(0, +(Number(state.targetInvestPct) - 1).toFixed(1));
+        triggerHaptic('light');
         saveState();
         updateUI();
       });
@@ -666,6 +912,7 @@
     if (elements.stepTargetUp) {
       elements.stepTargetUp.addEventListener('click', () => {
         state.targetInvestPct = Math.min(100, +(Number(state.targetInvestPct) + 1).toFixed(1));
+        triggerHaptic('light');
         saveState();
         updateUI();
       });
@@ -676,15 +923,95 @@
       btn.addEventListener('click', () => {
         const val = Number(btn.getAttribute('data-target'));
         state.targetInvestPct = val;
+        triggerHaptic('light');
         saveState();
         updateUI();
       });
     });
 
+    // 1-Click Rebalance Button
+    if (elements.applyRebalanceBtn) {
+      elements.applyRebalanceBtn.addEventListener('click', () => {
+        applyRebalance();
+      });
+    }
+
+    // Crash- & Stress-Test Simulation Controls
+    if (elements.stressSlider) {
+      elements.stressSlider.addEventListener('input', (e) => {
+        state.marketStress = Number(e.target.value) || 0;
+        saveState();
+        updateUI();
+      });
+    }
+
+    if (elements.stepStressDown) {
+      elements.stepStressDown.addEventListener('click', () => {
+        state.marketStress = Math.max(-50, Number(state.marketStress || 0) - 5);
+        triggerHaptic('light');
+        saveState();
+        updateUI();
+      });
+    }
+
+    if (elements.stepStressUp) {
+      elements.stepStressUp.addEventListener('click', () => {
+        state.marketStress = Math.min(50, Number(state.marketStress || 0) + 5);
+        triggerHaptic('light');
+        saveState();
+        updateUI();
+      });
+    }
+
+    if (elements.stressPresetBtns) {
+      elements.stressPresetBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.marketStress = Number(btn.getAttribute('data-stress')) || 0;
+          triggerHaptic('medium');
+          saveState();
+          updateUI();
+        });
+      });
+    }
+
+    if (elements.resetStressBtn) {
+      elements.resetStressBtn.addEventListener('click', () => {
+        state.marketStress = 0;
+        triggerHaptic('light');
+        saveState();
+        updateUI();
+      });
+    }
+
+    // Notgroschen & Runway Calculator Controls
+    if (elements.expensesInput) {
+      elements.expensesInput.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        if (!isNaN(val)) {
+          state.monthlyExpenses = Math.max(0, val);
+          saveState();
+          updateUI();
+        }
+      });
+    }
+
+    if (elements.expenseChips) {
+      elements.expenseChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const amt = Number(chip.getAttribute('data-val')) || 2500;
+          state.monthlyExpenses = amt;
+          triggerHaptic('light');
+          saveState();
+          updateUI();
+        });
+      });
+    }
+
     // Cashflow deposit input
     elements.cashflowInput.addEventListener('input', () => {
       const { invest, cash, total } = calculateTotals();
       updateCashflowDeposit(invest, cash, total, state.targetInvestPct);
+      updatePrognosis(total, (invest/total)*100, (cash/total)*100);
     });
 
     // Add Position Modal triggers
@@ -760,6 +1087,7 @@
     if (elements.stepInterestDown) {
       elements.stepInterestDown.addEventListener('click', () => {
         state.interestRate = Math.max(0, +(Number(state.interestRate) - 0.1).toFixed(2));
+        triggerHaptic('light');
         saveState();
         updateUI();
       });
@@ -768,6 +1096,7 @@
     if (elements.stepInterestUp) {
       elements.stepInterestUp.addEventListener('click', () => {
         state.interestRate = +(Number(state.interestRate) + 0.1).toFixed(2);
+        triggerHaptic('light');
         saveState();
         updateUI();
       });
@@ -793,6 +1122,7 @@
     if (elements.stepMarketDown) {
       elements.stepMarketDown.addEventListener('click', () => {
         state.marketRate = Math.max(0, +(Number(state.marketRate) - 0.5).toFixed(2));
+        triggerHaptic('light');
         saveState();
         updateUI();
       });
@@ -801,6 +1131,7 @@
     if (elements.stepMarketUp) {
       elements.stepMarketUp.addEventListener('click', () => {
         state.marketRate = +(Number(state.marketRate) + 0.5).toFixed(2);
+        triggerHaptic('light');
         saveState();
         updateUI();
       });

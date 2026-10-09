@@ -14,12 +14,26 @@ Eine elegante, minimalistische Web-App im **Apple OLED True Black Dark Mode**, o
   - Wunsch-Quote einstellen (z. B. 80/20, 70/30).
   - Zeigt exakt an, wie viel Euro investiert werden sollten oder wie viel Cash aufgebaut werden muss.
   - *Cashflow-Rebalancing*: Berechnet, wie neue Sparraten oder Boni aufgeteilt werden sollten.
-- **Zins- & Opportunitätskosten-Rechner (Neu)**:
+- **1-Klick Rebalancing (Neu)**:
+  - Ein Klick auf *"⚡ Rebalancing jetzt anwenden"* schichtet das Portfolio sofort in den Rechnerfeldern oder Positionen um, sodass die Ziel-Quote exakt getroffen wird.
+- **Crash- & Markt-Stresstest Simulator (Neu)**:
+  - Simuliere Marktbewegungen (-50 % Crash bis +50 % Bullenmarkt) über Slider oder Quick-Chips (-35 % Crash, -20 % Bär, +20 % Bulle).
+  - Zeigt exakt die resultierende Cash-Quote und den **antizyklischen Nachkauf-Betrag** am Markttiefpunkt an!
+- **Notgroschen- & Runway-Rechner (Neu)**:
+  - Erfasse monatliche Lebenshaltungskosten.
+  - Berechnet deine Cash-Reichweite in Monaten (Ampelsystem: Kritisch < 3 Mo., Optimal 3–6 Mo., Hoher Puffer > 6 Mo.).
+  - Weist sofort dein **freies Anlage-Cash** aus (Cash-Bestand abzüglich 6 Monate Sicherheitsreserve).
+- **Vermögens- & Zinseszins-Prognose (Neu)**:
+  - Berechnet den vermögensgewichteten Gesamtertrag p.a.
+  - Zeigt die Vermögensentwicklung in 3, 5, 10 und 20 Jahren inklusive Zinseszinseffekt bei Fortführung des Sparplans.
+- **Taptic Engine Haptic Feedback (Neu)**:
+  - Spürbares haptisches Feedback auf dem iPhone bei Betätigung von Steppern, Presets und Rebalancing-Buttons.
+- **Zins- & Opportunitätskosten-Rechner**:
   - Berechnet deinen monatlichen und jährlichen **passiven Zinsertrag** auf dein Cash (anpassbarer Tagesgeldzins).
   - Zeigt exakt deine **Opportunitätskosten** im Vergleich zur erwarteten Aktienmarktrendite (z. B. 7 % MSCI World).
-  - Visueller Vergleichsbalken mit Kontextanalyse.
-- **CSV- & Excel-Export / Portfolio Performance (Neu)**:
-  - *Excel / Apple Numbers (CSV)*: Fertig formatiert mit Semikolon (`;`), Datumsstempel, Einzelwerten, Quoten und Zinsstatistiken.
+  - Visueller Vergleichsbalken mit Feinjustierung (-0,1 % / +0,1 % und direkte Zahleneingabe).
+- **CSV- & Excel-Export / Portfolio Performance**:
+  - *Excel / Apple Numbers (CSV)*: Fertig formatiert mit Semikolon (`;`), UTF-8 BOM, Datumsstempel, Einzelwerten, Quoten und Zinsstatistiken.
   - *Portfolio Performance & Parqet (CSV)*: Direkt kompatibel zum Importieren deiner Depots und Konten.
 - **Privatsphäre-Modus**: Ein Klick auf das Augen-Symbol verschleiert alle sensiblen Beträge in der Öffentlichkeit (Blur-Effekt).
 - **Währungswahl**: Umschaltbar zwischen `€ EUR`, `$ USD` und `Fr CHF`.
