@@ -24,7 +24,9 @@
       { id: '3', name: 'Tagesgeld (3.5% Zinsen)', category: 'cash', amount: 20000 },
       { id: '4', name: 'Girokonto / Puffer', category: 'cash', amount: 5000 }
     ],
-    cashflowDeposit: 1000
+    cashflowDeposit: 1000,
+    interestRate: 3.5,
+    marketRate: 7.0
   };
 
   // State object
@@ -35,6 +37,7 @@
     currencySelect: document.getElementById('currency-select'),
     currencySigns: document.querySelectorAll('.currency-sign'),
     privacyToggleBtn: document.getElementById('privacy-toggle-btn'),
+    quickExportBtn: document.getElementById('quick-export-btn'),
     eyeIconOpen: document.getElementById('eye-icon-open'),
     eyeIconClosed: document.getElementById('eye-icon-closed'),
     settingsBtn: document.getElementById('settings-btn'),
@@ -61,6 +64,22 @@
     rebalanceDescription: document.getElementById('rebalance-description'),
     cashflowInput: document.getElementById('cashflow-input'),
     cashflowResult: document.getElementById('cashflow-result'),
+    // Feature 5: Interest & Opportunity Cost
+    toggleInterestControls: document.getElementById('toggle-interest-controls'),
+    interestControlsWrap: document.getElementById('interest-controls-wrap'),
+    sliderInterestRate: document.getElementById('slider-interest-rate'),
+    sliderMarketRate: document.getElementById('slider-market-rate'),
+    labelInterestRate: document.getElementById('label-interest-rate'),
+    labelMarketRate: document.getElementById('label-market-rate'),
+    oppInterestAnnual: document.getElementById('opp-interest-annual'),
+    oppInterestMonthly: document.getElementById('opp-interest-monthly'),
+    oppCostAnnual: document.getElementById('opp-cost-annual'),
+    oppCostDiff: document.getElementById('opp-cost-diff'),
+    oppBarCashPct: document.getElementById('opp-bar-cash-pct'),
+    oppBarMarketPct: document.getElementById('opp-bar-market-pct'),
+    oppBarFillIncome: document.getElementById('opp-bar-fill-income'),
+    oppBarFillDiff: document.getElementById('opp-bar-fill-diff'),
+    oppInsightText: document.getElementById('opp-insight-text'),
     // Quick inputs
     quickInputInvest: document.getElementById('quick-input-invest'),
     quickInputCash: document.getElementById('quick-input-cash'),
@@ -79,9 +98,11 @@
     radioCardInvest: document.getElementById('radio-card-invest'),
     radioCardCash: document.getElementById('radio-card-cash'),
     namePresets: document.querySelectorAll('.name-preset'),
-    // Settings Modal
+    // Settings Modal & Feature 8 Exports
     settingsModal: document.getElementById('settings-modal'),
     closeSettingsModal: document.getElementById('close-settings-modal'),
+    exportExcelBtn: document.getElementById('export-excel-btn'),
+    exportPpBtn: document.getElementById('export-pp-btn'),
     exportJsonBtn: document.getElementById('export-json-btn'),
     importJsonFile: document.getElementById('import-json-file'),
     loadSampleBtn: document.getElementById('load-sample-btn'),
@@ -224,6 +245,9 @@
     // Cashflow rebalancing
     updateCashflowDeposit(invest, cash, total, targetInvest);
 
+    // Feature 5: Interest & Opportunity Cost calculation
+    updateInterestAndOpportunity(cash);
+
     // Render positions if in detail mode
     renderPositionsList();
   }
@@ -300,6 +324,133 @@
     elements.cashflowResult.innerHTML = `Von deinen <strong>${formatMoney(deposit)}</strong>:<br>` +
       `• <strong style="color: var(--color-invest-light);">${formatMoney(allocateInvest)}</strong> investieren<br>` +
       `• <strong style="color: var(--color-cash-light);">${formatMoney(allocateCash)}</strong> ins Cash / Tagesgeld legen.`;
+  }
+
+  // ==========================================================================
+  // Feature 5: Interest & Opportunity Cost Calculation
+  // ==========================================================================
+  function updateInterestAndOpportunity(cash) {
+    const iRate = Number(state.interestRate) || 3.5;
+    const mRate = Number(state.marketRate) || 7.0;
+
+    elements.labelInterestRate.textContent = `${iRate.toFixed(2).replace('.', ',')}% p.a.`;
+    elements.labelMarketRate.textContent = `${mRate.toFixed(2).replace('.', ',')}% p.a.`;
+    elements.sliderInterestRate.value = iRate;
+    elements.sliderMarketRate.value = mRate;
+
+    // Calculations
+    const annualInterest = cash * (iRate / 100);
+    const monthlyInterest = annualInterest / 12;
+
+    const annualMarket = cash * (mRate / 100);
+    const oppCost = Math.max(0, annualMarket - annualInterest);
+    const rateDelta = Math.max(0, mRate - iRate);
+
+    elements.oppInterestAnnual.textContent = `+${formatMoney(annualInterest)} / Jahr`;
+    elements.oppInterestMonthly.textContent = `ca. +${formatMoney(monthlyInterest)} / Monat`;
+
+    elements.oppCostAnnual.textContent = `-${formatMoney(oppCost)} / Jahr`;
+    elements.oppCostDiff.textContent = `${rateDelta.toFixed(2).replace('.', ',')}% Rendite-Differenz`;
+
+    elements.oppBarCashPct.textContent = `${iRate.toFixed(1).replace('.', ',')}%`;
+    elements.oppBarMarketPct.textContent = `${mRate.toFixed(1).replace('.', ',')}%`;
+
+    if (mRate > 0) {
+      const incomePct = Math.min(100, Math.max(0, (iRate / mRate) * 100));
+      const diffPct = Math.min(100 - incomePct, Math.max(0, (rateDelta / mRate) * 100));
+      elements.oppBarFillIncome.style.width = `${incomePct}%`;
+      elements.oppBarFillDiff.style.width = `${diffPct}%`;
+    } else {
+      elements.oppBarFillIncome.style.width = '100%';
+      elements.oppBarFillDiff.style.width = '0%';
+    }
+
+    if (cash <= 0) {
+      elements.oppInsightText.textContent = 'Gib einen Cash-Betrag ein, um Zinserträge und Opportunitätskosten zu berechnen.';
+    } else {
+      elements.oppInsightText.innerHTML = `Bei deiner Cash-Reserve von <strong>${formatMoney(cash)}</strong> sicherst du dir ca. <strong>+${formatMoney(annualInterest)}</strong> Zinsen pro Jahr (${formatMoney(monthlyInterest)}/Monat). Gegenüber dem Aktienmarkt (${mRate.toFixed(1).replace('.', ',')}%) verzichtest du rechnerisch auf ca. <strong style="color: var(--color-warning);">-${formatMoney(oppCost)} / Jahr</strong> als Preis für sofortige Liquidität & Sicherheit.`;
+    }
+  }
+
+  // ==========================================================================
+  // Feature 8: CSV Export Functions (Excel & Portfolio Performance)
+  // ==========================================================================
+  function exportExcelCSV() {
+    const { invest, cash, total, investPct, cashPct } = calculateTotals();
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toLocaleTimeString('de-DE');
+
+    const lines = [];
+    lines.push('AssetRatio Portfolio Export;Erstellt am: ' + dateStr + ' ' + timeStr + ';;;;;');
+    lines.push(';');
+    lines.push('Nr;Position;Kategorie;Typ;Betrag;Anteil;Waehrung');
+
+    if (state.activeTab === 'quick') {
+      lines.push(`1;Investiertes Gesamtvermoegen;Investiert;Aktien / ETFs;${Number(state.quickInvest || 0).toFixed(2).replace('.', ',')};${investPct.toFixed(1).replace('.', ',')}%;${state.currency}`);
+      lines.push(`2;Cash & Liquiditaet;Cash;Tagesgeld / Giro;${Number(state.quickCash || 0).toFixed(2).replace('.', ',')};${cashPct.toFixed(1).replace('.', ',')}%;${state.currency}`);
+    } else {
+      state.positions.forEach((pos, idx) => {
+        const pct = total > 0 ? (pos.amount / total) * 100 : 0;
+        const catLabel = pos.category === 'invest' ? 'Investiert' : 'Cash';
+        const typeLabel = pos.category === 'invest' ? 'Depot / Krypto' : 'Liquiditaet';
+        lines.push(`${idx + 1};${pos.name.replace(/;/g, ',')};${catLabel};${typeLabel};${Number(pos.amount || 0).toFixed(2).replace('.', ',')};${pct.toFixed(1).replace('.', ',')}%;${state.currency}`);
+      });
+    }
+
+    lines.push(';');
+    lines.push(`SUMME;Gesamtvermoegen;;;${total.toFixed(2).replace('.', ',')};100,0%;${state.currency}`);
+    lines.push(`SUMME;Investiertes Vermoegen;;;${invest.toFixed(2).replace('.', ',')};${investPct.toFixed(1).replace('.', ',')}%;${state.currency}`);
+    lines.push(`SUMME;Cash-Reserve;;;${cash.toFixed(2).replace('.', ',')};${cashPct.toFixed(1).replace('.', ',')}%;${state.currency}`);
+    lines.push(';');
+    lines.push('KENNZAHLEN & REBALANCING;;;;;;');
+    lines.push(`Wunsch-Quote;Ziel-Allokation;;;${state.targetInvestPct}% Invest / ${100 - state.targetInvestPct}% Cash;;`);
+    const targetInvestAmt = total * (state.targetInvestPct / 100);
+    const investDelta = targetInvestAmt - invest;
+    lines.push(`Rebalancing-Bedarf;Invest-Delta;;;${investDelta.toFixed(2).replace('.', ',')};;${state.currency}`);
+    lines.push(`Tagesgeld-Zinsen (${state.interestRate}% p.a.);Jaehrlicher Ertrag;;;${(cash * (state.interestRate/100)).toFixed(2).replace('.', ',')};;${state.currency}`);
+    lines.push(`Tagesgeld-Zinsen (${state.interestRate}% p.a.);Monatlicher Ertrag;;;${((cash * (state.interestRate/100))/12).toFixed(2).replace('.', ',')};;${state.currency}`);
+    const oppCostAnnual = Math.max(0, (cash * (state.marketRate/100)) - (cash * (state.interestRate/100)));
+    lines.push(`Opportunitaetskosten (vs. ${state.marketRate}% Markt);Jaehrlich;;;${oppCostAnnual.toFixed(2).replace('.', ',')};;${state.currency}`);
+
+    const csvContent = '\uFEFF' + lines.join('\r\n');
+    downloadFile(csvContent, `AssetRatio_Excel_${dateStr}.csv`, 'text/csv;charset=utf-8;');
+  }
+
+  function exportPortfolioPerformanceCSV() {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const lines = [];
+    lines.push('Datum;Typ;Wert;Konto/Depot;Notiz');
+
+    if (state.activeTab === 'quick') {
+      if (state.quickInvest > 0) {
+        lines.push(`${dateStr};Depot;${Number(state.quickInvest).toFixed(2).replace('.', ',')};Investiertes Gesamtportfolio;AssetRatio Quick-Mode`);
+      }
+      if (state.quickCash > 0) {
+        lines.push(`${dateStr};Konto;${Number(state.quickCash).toFixed(2).replace('.', ',')};Cash-Liquiditaet;AssetRatio Quick-Mode`);
+      }
+    } else {
+      state.positions.forEach(pos => {
+        const type = pos.category === 'invest' ? 'Depot' : 'Konto';
+        lines.push(`${dateStr};${type};${Number(pos.amount).toFixed(2).replace('.', ',')};${pos.name.replace(/;/g, ',')};AssetRatio Detail`);
+      });
+    }
+
+    const csvContent = '\uFEFF' + lines.join('\r\n');
+    downloadFile(csvContent, `AssetRatio_PortfolioPerformance_${dateStr}.csv`, 'text/csv;charset=utf-8;');
+  }
+
+  function downloadFile(content, fileName, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   // ==========================================================================
@@ -545,6 +696,43 @@
       elements.radioCardInvest.click();
       closePosModal();
     });
+
+    // Feature 5: Interest Rate Controls
+    elements.sliderInterestRate.addEventListener('input', (e) => {
+      state.interestRate = Number(e.target.value);
+      saveState();
+      updateUI();
+    });
+
+    elements.sliderMarketRate.addEventListener('input', (e) => {
+      state.marketRate = Number(e.target.value);
+      saveState();
+      updateUI();
+    });
+
+    elements.toggleInterestControls.addEventListener('click', () => {
+      elements.interestControlsWrap.classList.toggle('hidden');
+      elements.toggleInterestControls.textContent = elements.interestControlsWrap.classList.contains('hidden') ? 'Anpassen' : 'Schließen';
+    });
+
+    // Feature 8: CSV Exports
+    if (elements.quickExportBtn) {
+      elements.quickExportBtn.addEventListener('click', () => {
+        elements.settingsModal.classList.add('active');
+      });
+    }
+
+    if (elements.exportExcelBtn) {
+      elements.exportExcelBtn.addEventListener('click', () => {
+        exportExcelCSV();
+      });
+    }
+
+    if (elements.exportPpBtn) {
+      elements.exportPpBtn.addEventListener('click', () => {
+        exportPortfolioPerformanceCSV();
+      });
+    }
 
     // Settings Modal triggers
     elements.settingsBtn.addEventListener('click', () => {

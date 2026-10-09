@@ -54,6 +54,13 @@
           </svg>
         </button>
 
+        <!-- Quick Export / CSV Button -->
+        <button id="quick-export-btn" class="icon-button" aria-label="Exportieren" title="Als Excel / CSV exportieren">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+        </button>
+
         <!-- Settings / Backup Button -->
         <button id="settings-btn" class="icon-button" aria-label="Einstellungen & Backup" title="Backup & Menü">
           <svg viewBox="0 0 24 24">
@@ -82,94 +89,164 @@
     <!-- Main Dashboard Grid -->
     <main class="dashboard-grid">
       
-      <!-- Left Column: Visual Chart & Overview -->
-      <section class="card overview-card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #A1A1AA;">
-              <path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v8.99L21.99 11C21.47 5.92 17.5 2 13 2zm0 11.01V22c4.5 0 8.47-3.92 8.99-9H13z"/>
-            </svg>
-            Vermögens-Aufteilung
-          </h2>
-        </div>
-
-        <!-- Animated SVG Donut Chart -->
-        <div class="chart-container">
-          <svg class="ring-chart-svg" viewBox="0 0 220 220">
-            <!-- Background track -->
-            <circle class="ring-bg" cx="110" cy="110" r="90" />
-            <!-- Cash Ring Arc (Cyan) -->
-            <circle id="chart-ring-cash" class="ring-cash" cx="110" cy="110" r="90" stroke-dasharray="565.48" stroke-dashoffset="0" />
-            <!-- Invested Ring Arc (Emerald Green) -->
-            <circle id="chart-ring-invest" class="ring-invest" cx="110" cy="110" r="90" stroke-dasharray="565.48" stroke-dashoffset="0" />
-          </svg>
-
-          <!-- Center Text Overlay -->
-          <div class="chart-center-content">
-            <div class="chart-center-label">Gesamtvermögen</div>
-            <div id="stat-total-amount" class="chart-center-value privacy-sensitive">0 €</div>
-          </div>
-        </div>
-
-        <!-- Ratio Breakdown Statistics -->
-        <div class="stats-grid">
-          <!-- Invested Stat -->
-          <div class="stat-tile invest">
-            <div class="stat-label-group">
-              <span class="stat-name">Investiert</span>
-              <span id="stat-invest-pct" class="stat-badge">0,0%</span>
-            </div>
-            <div id="stat-invest-amount" class="stat-amount privacy-sensitive">0 €</div>
-          </div>
-
-          <!-- Cash Stat -->
-          <div class="stat-tile cash">
-            <div class="stat-label-group">
-              <span class="stat-name">Cash-Reserve</span>
-              <span id="stat-cash-pct" class="stat-badge">0,0%</span>
-            </div>
-            <div id="stat-cash-amount" class="stat-amount privacy-sensitive">0 €</div>
-          </div>
-        </div>
-
-        <!-- Target Allocation & Rebalancing -->
-        <div class="target-section">
-          <div class="target-header">
-            <span class="stat-name">Wunsch-Allokation</span>
-            <div class="target-ratios">
-              <span id="target-invest-label" class="invest-target">80%</span> Invest /
-              <span id="target-cash-label" class="cash-target">20%</span> Cash
-            </div>
-          </div>
-
-          <!-- Interactive Target Slider -->
-          <div class="slider-container">
-            <input type="range" id="target-slider" class="allocation-slider" min="0" max="100" value="80" step="5" aria-label="Wunsch-Quote Investiert zu Cash">
-          </div>
-
-          <!-- Target Presets -->
-          <div class="slider-presets">
-            <button class="preset-btn" data-target="90">90 / 10</button>
-            <button class="preset-btn active" data-target="80">80 / 20</button>
-            <button class="preset-btn" data-target="70">70 / 30</button>
-            <button class="preset-btn" data-target="60">60 / 40</button>
-            <button class="preset-btn" data-target="50">50 / 50</button>
-          </div>
-
-          <!-- Rebalancing Feedback Card -->
-          <div id="rebalance-card" class="rebalance-box">
-            <div id="rebalance-icon" class="rebalance-icon-wrap buy">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7 14l5-5 5 5z"/>
+      <!-- Left Column: Overview & Interest Calculator -->
+      <div class="dashboard-left-col">
+        
+        <!-- Visual Chart & Overview Card -->
+        <section class="card overview-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: #A1A1AA;">
+                <path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v8.99L21.99 11C21.47 5.92 17.5 2 13 2zm0 11.01V22c4.5 0 8.47-3.92 8.99-9H13z"/>
               </svg>
-            </div>
-            <div class="rebalance-text">
-              <h4 id="rebalance-title">Rebalancing-Empfehlung</h4>
-              <p id="rebalance-description">Gib deine Werte ein, um die optimale Allokation zu berechnen.</p>
+              Vermögens-Aufteilung
+            </h2>
+          </div>
+
+          <!-- Animated SVG Donut Chart -->
+          <div class="chart-container">
+            <svg class="ring-chart-svg" viewBox="0 0 220 220">
+              <!-- Background track -->
+              <circle class="ring-bg" cx="110" cy="110" r="90" />
+              <!-- Cash Ring Arc (Cyan) -->
+              <circle id="chart-ring-cash" class="ring-cash" cx="110" cy="110" r="90" stroke-dasharray="565.48" stroke-dashoffset="0" />
+              <!-- Invested Ring Arc (Emerald Green) -->
+              <circle id="chart-ring-invest" class="ring-invest" cx="110" cy="110" r="90" stroke-dasharray="565.48" stroke-dashoffset="0" />
+            </svg>
+
+            <!-- Center Text Overlay -->
+            <div class="chart-center-content">
+              <div class="chart-center-label">Gesamtvermögen</div>
+              <div id="stat-total-amount" class="chart-center-value privacy-sensitive">0 €</div>
             </div>
           </div>
-        </div>
-      </section>
+
+          <!-- Ratio Breakdown Statistics -->
+          <div class="stats-grid">
+            <!-- Invested Stat -->
+            <div class="stat-tile invest">
+              <div class="stat-label-group">
+                <span class="stat-name">Investiert</span>
+                <span id="stat-invest-pct" class="stat-badge">0,0%</span>
+              </div>
+              <div id="stat-invest-amount" class="stat-amount privacy-sensitive">0 €</div>
+            </div>
+
+            <!-- Cash Stat -->
+            <div class="stat-tile cash">
+              <div class="stat-label-group">
+                <span class="stat-name">Cash-Reserve</span>
+                <span id="stat-cash-pct" class="stat-badge">0,0%</span>
+              </div>
+              <div id="stat-cash-amount" class="stat-amount privacy-sensitive">0 €</div>
+            </div>
+          </div>
+
+          <!-- Target Allocation & Rebalancing -->
+          <div class="target-section">
+            <div class="target-header">
+              <span class="stat-name">Wunsch-Allokation</span>
+              <div class="target-ratios">
+                <span id="target-invest-label" class="invest-target">80%</span> Invest /
+                <span id="target-cash-label" class="cash-target">20%</span> Cash
+              </div>
+            </div>
+
+            <!-- Interactive Target Slider -->
+            <div class="slider-container">
+              <input type="range" id="target-slider" class="allocation-slider" min="0" max="100" value="80" step="5" aria-label="Wunsch-Quote Investiert zu Cash">
+            </div>
+
+            <!-- Target Presets -->
+            <div class="slider-presets">
+              <button class="preset-btn" data-target="90">90 / 10</button>
+              <button class="preset-btn active" data-target="80">80 / 20</button>
+              <button class="preset-btn" data-target="70">70 / 30</button>
+              <button class="preset-btn" data-target="60">60 / 40</button>
+              <button class="preset-btn" data-target="50">50 / 50</button>
+            </div>
+
+            <!-- Rebalancing Feedback Card -->
+            <div id="rebalance-card" class="rebalance-box">
+              <div id="rebalance-icon" class="rebalance-icon-wrap buy">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 14l5-5 5 5z"/>
+                </svg>
+              </div>
+              <div class="rebalance-text">
+                <h4 id="rebalance-title">Rebalancing-Empfehlung</h4>
+                <p id="rebalance-description">Gib deine Werte ein, um die optimale Allokation zu berechnen.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Feature 5: Cash-Zinsen & Opportunitätskosten Rechner -->
+        <section class="card interest-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-warning);">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+              </svg>
+              Zinsen & Opportunitätskosten
+            </h2>
+            <button id="toggle-interest-controls" class="chip-btn" style="padding: 4px 8px;">Anpassen</button>
+          </div>
+
+          <!-- Interest & Market Rates Controls -->
+          <div id="interest-controls-wrap" class="interest-rates-grid">
+            <!-- Rate 1: Tagesgeld Zins -->
+            <div class="rate-box">
+              <div class="rate-label-wrap">
+                <span class="rate-label">Tagesgeld-Zins</span>
+                <span id="label-interest-rate" class="rate-badge cash">3,50% p.a.</span>
+              </div>
+              <input type="range" id="slider-interest-rate" class="rate-slider" min="0" max="6" step="0.25" value="3.5" aria-label="Tagesgeld Zinssatz">
+            </div>
+
+            <!-- Rate 2: Aktienmarkt Rendite -->
+            <div class="rate-box">
+              <div class="rate-label-wrap">
+                <span class="rate-label">Aktien-Rendite</span>
+                <span id="label-market-rate" class="rate-badge market">7,00% p.a.</span>
+              </div>
+              <input type="range" id="slider-market-rate" class="rate-slider" min="3" max="12" step="0.5" value="7.0" aria-label="Erwartete Aktienmarktrendite">
+            </div>
+          </div>
+
+          <!-- Output Metrics: Zinsertrag vs. Opportunitätskosten -->
+          <div class="opp-results-grid">
+            <!-- Card 1: Passiver Zinsertrag -->
+            <div class="opp-stat-card income">
+              <div class="opp-stat-title">Passiver Cash-Zinsertrag</div>
+              <div id="opp-interest-annual" class="opp-stat-value privacy-sensitive">+0 € / Jahr</div>
+              <div id="opp-interest-monthly" class="opp-stat-sub privacy-sensitive">ca. +0 € / Monat</div>
+            </div>
+
+            <!-- Card 2: Opportunitätskosten -->
+            <div class="opp-stat-card opportunity">
+              <div class="opp-stat-title">Entgangene Rendite (vs. Markt)</div>
+              <div id="opp-cost-annual" class="opp-stat-value privacy-sensitive">-0 € / Jahr</div>
+              <div id="opp-cost-diff" class="opp-stat-sub">3,50% Rendite-Differenz</div>
+            </div>
+          </div>
+
+          <!-- Visual Comparison Bar -->
+          <div class="opp-bar-container">
+            <div class="opp-bar-header">
+              <span>Zinsertrag (<span id="opp-bar-cash-pct">3,5%</span>)</span>
+              <span>Marktrendite (<span id="opp-bar-market-pct">7,0%</span>)</span>
+            </div>
+            <div class="opp-bar-track">
+              <div id="opp-bar-fill-income" class="opp-bar-fill-income" style="width: 50%;"></div>
+              <div id="opp-bar-fill-diff" class="opp-bar-fill-diff" style="width: 50%;"></div>
+            </div>
+            <p id="opp-insight-text" class="opp-explanation">
+              Bei deinem Cash-Bestand generierst du passive Zinsen, verzichtest aber auf langfristige Renditechancen am Aktienmarkt.
+            </p>
+          </div>
+        </section>
+      </div>
 
       <!-- Right Column: Input Controls & Positions -->
       <section class="card input-card">
@@ -361,14 +438,37 @@
 
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-          Deine Daten werden sicher und lokal in deinem Browser (LocalStorage) gespeichert. Du kannst jederzeit eine Sicherungskopie exportieren.
+          Deine Daten werden sicher und lokal in deinem Browser (LocalStorage) gespeichert. Du kannst deine Daten jederzeit als Excel/CSV oder JSON exportieren.
         </p>
+
+        <!-- Feature 8: CSV & Excel Export Cards -->
+        <div class="export-options-grid">
+          <button type="button" id="export-excel-btn" class="export-btn-card">
+            <div class="export-btn-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #10B981;">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+              </svg>
+              Excel / Numbers (CSV)
+            </div>
+            <div class="export-btn-desc">Formatierte Tabelle mit Semikolon (;), Quoten & Zinsen.</div>
+          </button>
+
+          <button type="button" id="export-pp-btn" class="export-btn-card">
+            <div class="export-btn-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color: #38BDF8;">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+              </svg>
+              Portfolio Performance
+            </div>
+            <div class="export-btn-desc">Direkt kompatibel für Depot- & Kontobestände in PP / Parqet.</div>
+          </button>
+        </div>
 
         <button id="export-json-btn" class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
           </svg>
-          Portfolio-Backup exportieren (JSON)
+          Vollständiges Backup (JSON)
         </button>
 
         <label class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
